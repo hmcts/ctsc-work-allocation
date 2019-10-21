@@ -20,6 +20,7 @@ java:
     SPRING_DATASOURCE_USERNAME: workallocation@ctsc-postgres-db-{{.Values.global.environment }}
     SPRING_LIQUIBASE_ENABLED: false
 
+    S2S_SECRET: ${S2S_SECRET}
     S2S_AUTH_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     IDAM_CLIENT_BASE_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     PAYMENT_API_URL: http://payment-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
