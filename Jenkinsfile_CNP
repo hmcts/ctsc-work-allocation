@@ -19,7 +19,7 @@ def onPRNotificationsChannel = '#ctsc-pr-builds'
 
 def secrets = [
     's2s-${env}': [
-        secret('microservicekey-ctsc-work-allocation', 'S2S_SECRET')
+        secret('microservicekey-ctsc-work-allocation', 'S2S_IDAM_SECRET')
     ]
 ]
 
