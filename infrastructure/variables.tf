@@ -103,7 +103,7 @@ variable "poll_cron" {
 }
 
 variable "last_modified_minus_minutes" {
-  default = "5"
+  default = "0"
 }
 
 variable "ccd_dry_run" {
