@@ -30,7 +30,7 @@ public class CcdConnectorService {
         + "\"operator\": \"or\"}}}]}},\"size\": 500}";
 
     @Autowired
-    public CcdConnectorService(CcdClient ccdClient){
+    public CcdConnectorService(CcdClient ccdClient) {
         this.ccdClient = ccdClient;
     }
 
