@@ -101,7 +101,7 @@ public class CcdPollingService {
             // 4. connect to CCD, and get the data
             // TODO  Properly setup overlap between the runs
             // TODO Change the query to include end time as well
-            String queryDateTime = lastRunTime.minusSeconds(lastModifiedTimeMinusMinutes).toString();
+            String queryDateTime = lastRunTime.minusMinutes(lastModifiedTimeMinusMinutes).toString();
             Map<String, Object> response = ccdConnectorService.searchCases(userAuthToken, serviceToken, queryDateTime);
             log.info("Connecting to CCD was successful");
             log.info("total number of cases: {}", response.get("total"));
