@@ -42,8 +42,8 @@ public class TaskVelocityContextTest {
     }
 
     @Test
-    public void testGetTemplateFileNameWhenJurisdictionIsNull() {
-        task.setJurisdiction(null);
+    public void testGetTemplateFileNameWhenJurisdictionIsEmpty() {
+        task.setJurisdiction("");
         String templateFileName = this.context.getTemplateFileName(task);
         Assert.assertEquals("divorce.vm", templateFileName);
     }

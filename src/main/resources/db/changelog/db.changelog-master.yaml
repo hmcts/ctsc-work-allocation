@@ -84,3 +84,43 @@ databaseChangeLog:
                 FOREIGN KEY (event_id) REFERENCES logging_event(event_id) ON DELETE CASCADE
               );
 
+  - changeSet:
+      id: 4
+      author: akiss
+      changes:
+        - createTable:
+            tableName: task
+            columns:
+              - column:
+                  name: id
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: state
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: jurisdiction
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: case_type_id
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sent
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+

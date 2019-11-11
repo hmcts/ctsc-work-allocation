@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.workallocation.email;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import uk.gov.hmcts.reform.workallocation.model.Task;
 
@@ -30,6 +31,6 @@ public class TaskVelocityContext implements TypedVelocityContext<Task> {
     }
 
     private String getJurisdiction(Task task) {
-        return task.getJurisdiction() != null ? task.getJurisdiction().toLowerCase() : "divorce";
+        return StringUtils.isBlank(task.getJurisdiction()) ? "divorce" : task.getJurisdiction().toLowerCase();
     }
 }

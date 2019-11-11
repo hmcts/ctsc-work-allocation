@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.workallocation.email.IEmailSendingService;
 import uk.gov.hmcts.reform.workallocation.model.Task;
 import uk.gov.hmcts.reform.workallocation.services.DummyEmailSendingService;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class DummyEmailSendingServiceTest {
@@ -14,7 +15,13 @@ public class DummyEmailSendingServiceTest {
     public void testSend() throws Exception {
         IEmailSendingService service = new DummyEmailSendingService();
         long start = new Date().getTime();
-        service.sendEmail(Task.builder().build(), "");
+        service.sendEmail(Task.builder()
+            .id("")
+            .state("")
+            .lastModifiedDate(LocalDateTime.now())
+            .caseTypeId("")
+            .jurisdiction("")
+            .build(), "");
         long end = new Date().getTime();
         Assert.assertTrue(end - start >= 2000);
     }

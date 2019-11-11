@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import uk.gov.hmcts.reform.workallocation.exception.CaseTransformException;
 import uk.gov.hmcts.reform.workallocation.exception.CcdConnectionException;
 import uk.gov.hmcts.reform.workallocation.idam.IdamConnectionException;
 import uk.gov.hmcts.reform.workallocation.idam.IdamService;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.reform.workallocation.model.Task;
 import uk.gov.hmcts.reform.workallocation.queue.DeadQueueConsumer;
 import uk.gov.hmcts.reform.workallocation.queue.QueueConsumer;
 import uk.gov.hmcts.reform.workallocation.queue.QueueProducer;
+import uk.gov.hmcts.reform.workallocation.repository.TaskRepository;
 import uk.gov.hmcts.reform.workallocation.services.CcdConnectorService;
 import uk.gov.hmcts.reform.workallocation.services.CcdPollingService;
 import uk.gov.hmcts.reform.workallocation.services.LastRunTimeService;
@@ -57,12 +59,15 @@ public class CcdPollingServiceTest {
     @Mock
     private CcdConnectorService ccdConnectorService;
 
+    @Mock
+    private TaskRepository taskRepository;
+
     @Before
     public void setup() throws IOException, IdamConnectionException, CcdConnectionException {
         MockitoAnnotations.initMocks(this);
         ccdPollingService = new CcdPollingService(idamService, ccdConnectorService, lastRunTimeService,
             30, 5, queueProducer,
-            queueConsumer, deadQueueConsumer, telemetryClient);
+            queueConsumer, deadQueueConsumer, telemetryClient, taskRepository);
 
         when(deadQueueConsumer.runConsumer(any())).thenReturn(CompletableFuture.completedFuture(null));
         when(queueConsumer.runConsumer(any())).thenReturn(CompletableFuture.completedFuture(null));
@@ -152,6 +157,49 @@ public class CcdPollingServiceTest {
             .thenThrow(new RuntimeException("Something went wrong"));
         ccdPollingService.pollCcdEndpoint();
         verify(lastRunTimeService, times(2)).updateLastRuntime(any(LocalDateTime.class));
+    }
+
+    @Test
+    public void testPollccdEndpointWithOverlap() throws CcdConnectionException {
+        when(lastRunTimeService.getLastRunTime()).thenReturn(Optional.of(LocalDateTime.of(2019, 9, 25, 12, 0, 0, 0)));
+        when(taskRepository.findAll()).thenReturn(Collections.singletonList(getTask()));
+        ccdPollingService.pollCcdEndpoint();
+        String queryDate = "2019-09-25T11:55";
+        verify(ccdConnectorService, times(1)).searchCases("idam_token", "service_token", queryDate);
+        verify(queueProducer, times(1)).placeItemsInQueue(eq(Collections.emptyList()), any());
+        verify(lastRunTimeService, times(1)).updateLastRuntime(any(LocalDateTime.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testPollccdEndpointWhenThereIsTaskToWriteInDb() throws CcdConnectionException, IOException, CaseTransformException {
+        when(lastRunTimeService.getLastRunTime()).thenReturn(Optional.of(LocalDateTime.of(2019, 9, 25, 12, 0, 0, 0)));
+        Map<String, Object> searchResult = caseSearchResult();
+        List<Object> cases = (List<Object>) searchResult.get("cases");
+        Map<String, Object> ccdCase = (Map<String, Object>) cases.get(0);
+        ccdCase.put("last_modified", LocalDateTime.now().minusMinutes(5).toString());
+        when(ccdConnectorService.searchCases(anyString(), anyString(), anyString())).thenReturn(searchResult);
+        ccdPollingService.pollCcdEndpoint();
+        String queryDate = "2019-09-25T11:55";
+        Task task = Task.fromCcdDCase((Map<String, Object>) ((List) searchResult.get("cases")).get(0));
+        verify(ccdConnectorService, times(1)).searchCases("idam_token", "service_token", queryDate);
+        verify(queueProducer, times(1)).placeItemsInQueue(eq(Collections.singletonList(task)), any());
+        verify(lastRunTimeService, times(1)).updateLastRuntime(any(LocalDateTime.class));
+        verify(taskRepository, times(1)).truncateTaskTable();
+        verify(taskRepository, times(1)).saveAll(Collections.singletonList(task));
+    }
+
+    @Test
+    public void testPollccdEndpointWhenTaskIsOutsideOfOverlap() throws CcdConnectionException, IOException {
+        when(lastRunTimeService.getLastRunTime()).thenReturn(Optional.of(LocalDateTime.of(2019, 9, 25, 12, 0, 0, 0)));
+        ccdPollingService.pollCcdEndpoint();
+        String queryDate = "2019-09-25T11:55";
+        Task task = getTask();
+        verify(ccdConnectorService, times(1)).searchCases("idam_token", "service_token", queryDate);
+        verify(queueProducer, times(1)).placeItemsInQueue(eq(Collections.singletonList(task)), any());
+        verify(lastRunTimeService, times(1)).updateLastRuntime(any(LocalDateTime.class));
+        verify(taskRepository, times(1)).truncateTaskTable();
+        verify(taskRepository, times(1)).saveAll(Collections.emptyList());
     }
 
     //CHECKSTYLE:OFF

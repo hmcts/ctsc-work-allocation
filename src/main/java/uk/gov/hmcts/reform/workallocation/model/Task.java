@@ -8,13 +8,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import uk.gov.hmcts.reform.workallocation.exception.CaseTransformException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Data
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,13 +28,25 @@ import java.util.Map;
 @EqualsAndHashCode
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class Task {
+public class Task implements Comparable<Task> {
 
+    @Id
     private String id;
+
+    @NonNull
     private String state;
+
+    @NonNull
     private String jurisdiction;
+
+    @NonNull
     private String caseTypeId;
+
+    @NonNull
+    @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
     private LocalDateTime lastModifiedDate;
+
+    private boolean sent;
 
     public static Task fromCcdDCase(Map<String, Object> caseData) throws CaseTransformException {
         try {
@@ -45,4 +63,8 @@ public class Task {
         }
     }
 
+    @Override
+    public int compareTo(Task o) {
+        return o.lastModifiedDate.compareTo(this.lastModifiedDate);
+    }
 }

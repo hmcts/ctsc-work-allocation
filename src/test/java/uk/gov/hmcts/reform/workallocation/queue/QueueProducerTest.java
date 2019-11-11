@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.workallocation.model.Task;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +42,15 @@ public class QueueProducerTest {
     public void testPlaceItemInQueue() {
         List<Task> tasks = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            tasks.add(Task.builder().id(Integer.toString(i)).build());
+            tasks.add(
+                Task.builder()
+                    .caseTypeId("DIVORCE")
+                    .id(Integer.toString(i))
+                    .jurisdiction("DIVORCE")
+                    .state("Submitted")
+                    .lastModifiedDate(LocalDateTime.now())
+                    .build()
+            );
         }
         queueProducer.placeItemsInQueue(tasks, Task::getId);
         Assert.assertEquals(5, itemsToSend.size());

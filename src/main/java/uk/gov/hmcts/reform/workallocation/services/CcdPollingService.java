@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.workallocation.queue.DeadQueueConsumer;
 import uk.gov.hmcts.reform.workallocation.queue.DelayedExecutor;
 import uk.gov.hmcts.reform.workallocation.queue.QueueConsumer;
 import uk.gov.hmcts.reform.workallocation.queue.QueueProducer;
+import uk.gov.hmcts.reform.workallocation.repository.TaskRepository;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -35,6 +36,7 @@ public class CcdPollingService {
     private final QueueProducer<Task> queueProducer;
     private final QueueConsumer<Task> queueConsumer;
     private final DeadQueueConsumer deadQueueConsumer;
+    private final TaskRepository taskRepository;
 
     private final int lastModifiedTimeMinusMinutes;
     private final int pollIntervalMinutes;
@@ -45,7 +47,8 @@ public class CcdPollingService {
                              @Value("${service.poll_interval_minutes}") int pollIntervalMinutes,
                              @Value("${service.last_modified_minus_minutes}") int lastModifiedTimeMinusMinutes,
                              QueueProducer<Task> queueProducer, QueueConsumer<Task> queueConsumer,
-                             DeadQueueConsumer deadQueueConsumer, TelemetryClient telemetryClient) {
+                             DeadQueueConsumer deadQueueConsumer, TelemetryClient telemetryClient,
+                             TaskRepository taskRepository) {
         this.idamService = idamService;
         this.ccdConnectorService = ccdConnectorService;
         this.lastRunTimeService = lastRunTimeService;
@@ -55,6 +58,7 @@ public class CcdPollingService {
         this.telemetryClient = telemetryClient;
         this.lastModifiedTimeMinusMinutes = lastModifiedTimeMinusMinutes;
         this.pollIntervalMinutes = pollIntervalMinutes;
+        this.taskRepository = taskRepository;
     }
 
     @Scheduled(cron = "${service.poll_cron}")
@@ -110,6 +114,7 @@ public class CcdPollingService {
             // 5. Process data
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> cases = (List<Map<String, Object>>) response.get("cases");
+            List<Task> previousTasks = taskRepository.findAll();
             List<Task> tasks = cases.stream().map(o -> {
                 try {
                     return Task.fromCcdDCase(o);
@@ -117,18 +122,32 @@ public class CcdPollingService {
                     log.error("Failed to parse case", e);
                     return null;
                 }
-            }).filter(Objects::nonNull).collect(Collectors.toList());
+            }).filter(Objects::nonNull)
+                .filter(task -> !previousTasks.contains(task))
+                .sorted()
+                .collect(Collectors.toList());
             log.info("total number of tasks: {}", tasks.size());
             telemetryClient.trackMetric("num_of_tasks", tasks.size());
 
             // 6. send to azure service bus
             queueProducer.placeItemsInQueue(tasks, Task::getId);
+            saveLastRunResults(tasks, now);
         } catch (Exception e) {
             log.error("Failed to run poller", e);
             if (lastRunTime != null) {
                 lastRunTimeService.updateLastRuntime(lastRunTime);
             }
         }
+    }
+
+    private void saveLastRunResults(final List<Task> tasks, final LocalDateTime now) {
+        taskRepository.truncateTaskTable();
+        final LocalDateTime nowMinusTen = now.minusMinutes(10);
+        List<Task> taskToStore = tasks.stream()
+            .filter(task -> task.getLastModifiedDate().isAfter(nowMinusTen))
+            .collect(Collectors.toList());
+        taskRepository.saveAll(taskToStore);
+
     }
 
     private LocalDateTime readLastRunTime() {
