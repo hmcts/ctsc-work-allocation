@@ -172,12 +172,13 @@ public class CcdPollingServiceTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void testPollccdEndpointWhenThereIsTaskToWriteInDb() throws CcdConnectionException, IOException, CaseTransformException {
+    public void testPollccdEndpointWhenThereIsTaskToWriteInDb()
+            throws CcdConnectionException, IOException, CaseTransformException {
         when(lastRunTimeService.getLastRunTime()).thenReturn(Optional.of(LocalDateTime.of(2019, 9, 25, 12, 0, 0, 0)));
         Map<String, Object> searchResult = caseSearchResult();
         List<Object> cases = (List<Object>) searchResult.get("cases");
         Map<String, Object> ccdCase = (Map<String, Object>) cases.get(0);
-        ccdCase.put("last_modified", LocalDateTime.now().minusMinutes(5).toString());
+        ccdCase.put("last_modified", LocalDateTime.now().minusMinutes(3).toString());
         when(ccdConnectorService.searchCases(anyString(), anyString(), anyString())).thenReturn(searchResult);
         ccdPollingService.pollCcdEndpoint();
         String queryDate = "2019-09-25T11:55";
@@ -199,7 +200,7 @@ public class CcdPollingServiceTest {
         verify(queueProducer, times(1)).placeItemsInQueue(eq(Collections.singletonList(task)), any());
         verify(lastRunTimeService, times(1)).updateLastRuntime(any(LocalDateTime.class));
         verify(taskRepository, times(1)).truncateTaskTable();
-        verify(taskRepository, times(1)).saveAll(Collections.emptyList());
+        verify(taskRepository, times(0)).saveAll(any());
     }
 
     //CHECKSTYLE:OFF

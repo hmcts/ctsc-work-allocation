@@ -142,11 +142,13 @@ public class CcdPollingService {
 
     private void saveLastRunResults(final List<Task> tasks, final LocalDateTime now) {
         taskRepository.truncateTaskTable();
-        final LocalDateTime nowMinusTen = now.minusMinutes(10);
-        List<Task> taskToStore = tasks.stream()
-            .filter(task -> task.getLastModifiedDate().isAfter(nowMinusTen))
+        final LocalDateTime nowMinusMinutes = now.minusMinutes(lastModifiedTimeMinusMinutes);
+        List<Task> tasksToStore = tasks.stream()
+            .filter(task -> task.getLastModifiedDate().isAfter(nowMinusMinutes))
             .collect(Collectors.toList());
-        taskRepository.saveAll(taskToStore);
+        if (!tasksToStore.isEmpty()) {
+            taskRepository.saveAll(tasksToStore);
+        }
 
     }
 
