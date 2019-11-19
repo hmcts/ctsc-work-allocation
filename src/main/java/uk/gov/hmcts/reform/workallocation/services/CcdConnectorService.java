@@ -31,7 +31,7 @@ public class CcdConnectorService {
         + ",{\"match\":{\"state\":{\"query\": \"Submitted AwaitingHWFDecision DARequested\","
         + "\"operator\": \"or\"}}}]}},"
         + "\"_source\": [\"reference\", \"jurisdiction\", \"state\", \"last_modified\"],"
-        + "\"size\": 500}";
+        + "\"size\": 1000}";
 
     @Autowired
     public CcdConnectorService(CcdClient ccdClient) {
