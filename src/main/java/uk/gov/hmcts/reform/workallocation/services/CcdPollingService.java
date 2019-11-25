@@ -106,19 +106,30 @@ public class CcdPollingService {
         // TODO Change the query to include end time as well
         String queryFromDateTime = lastRunTime.minusMinutes(lastModifiedTimeMinusMinutes).toString();
         String queryToDateTime = now.toString();
-        Map<String, Object> response = ccdConnectorService.searchCases(userAuthToken, serviceToken,
+        // Divorce cases
+        Map<String, Object> divorceData = ccdConnectorService.searchDivorceCases(userAuthToken, serviceToken,
             queryFromDateTime, queryToDateTime);
         log.info("Connecting to CCD was successful");
-        log.info("total number of cases: {}", response.get("total"));
-        telemetryClient.trackMetric("num_of_cases", (Integer) response.get("total"));
+        log.info("total number of divorce cases: {}", divorceData.get("total"));
+        telemetryClient.trackMetric("num_of_divorce_cases", (Integer) divorceData.get("total"));
+
+        // Probate cases
+        Map<String, Object> probateData = ccdConnectorService.searchProbateCases(userAuthToken, serviceToken,
+            queryFromDateTime, queryToDateTime);
+        log.info("Connecting to CCD was successful");
+        log.info("total number of probate cases: {}", probateData.get("total"));
+        telemetryClient.trackMetric("num_of_probate_cases", (Integer) probateData.get("total"));
 
         // 5. Process data
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> cases = (List<Map<String, Object>>) response.get("cases");
-        String caseTypeId = (String) response.get("case_type_id");
+        List<Map<String, Object>> cases = (List<Map<String, Object>>) divorceData.get("cases");
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> probateCases = (List<Map<String, Object>>) probateData.get("cases");
+        cases.addAll(probateCases);
+
         List<Task> tasks = cases.stream().map(o -> {
             try {
-                return Task.fromCcdDCase(o, caseTypeId);
+                return Task.fromCcdCase(o);
             } catch (Exception e) {
                 log.error("Failed to parse case", e);
                 return null;

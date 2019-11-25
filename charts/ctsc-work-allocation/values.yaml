@@ -12,6 +12,7 @@ java:
         - CTSC-SERVICE-USER-PASSWORD
         - CTSC-SERVICEBUS-CONNECTION-STRING
         - wa-service-email-address
+        - wa-service-probate-email-address
         - work-allocation-POSTGRES-PASS
         - CTSC-WA-SMTP-USER
         - CTSC-WA-SMTP-PASSWORD
