@@ -66,10 +66,17 @@ public class CcdPollingServiceTest {
 
         when(deadQueueConsumer.runConsumer(any())).thenReturn(CompletableFuture.completedFuture(null));
         when(queueConsumer.runConsumer(any())).thenReturn(CompletableFuture.completedFuture(null));
+
+        Map<String, Object> divorceResponse = divorceSearchResult();
+        divorceResponse.put("case_type_id", "DIVORCE");
         when(ccdConnectorService.searchDivorceCases(anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(divorceSearchResult());
+            .thenReturn(divorceResponse);
+
+        Map<String, Object> probateResponse = probateSearchResult();
+        probateResponse.put("case_type_id", "GrantOfRepresentation");
         when(ccdConnectorService.searchProbateCases(anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(probateSearchResult());
+            .thenReturn(probateResponse);
+
         when(idamService.generateServiceAuthorization()).thenReturn("service_token");
         when(idamService.getIdamOauth2Token()).thenReturn("idam_token");
         when(lastRunTimeService.getMinDate()).thenReturn(LocalDateTime.of(2019, 9, 20, 12, 0, 0, 0));
@@ -173,7 +180,7 @@ public class CcdPollingServiceTest {
             + "    \"jurisdiction\": \"DIVORCE\",\n"
             + "    \"state\": \"Submitted\",\n"
             + "    \"version\": null,\n"
-            + "    \"case_type_id\": \"DIVORCE\",\n"
+            + "    \"case_type_id\": null,\n"
             + "    \"created_date\": \"2019-07-18T14:35:51.473\",\n"
             + "    \"last_modified\": \"2019-07-18T14:36:25.862\",\n"
             + "    \"security_classification\": null\n"
@@ -193,7 +200,7 @@ public class CcdPollingServiceTest {
             + "     \"jurisdiction\": \"PROBATE\",\n"
             + "     \"state\": \"BOReadyForExamination\",\n"
             + "     \"version\": null,\n"
-            + "     \"case_type_id\": \"GrantOfRepresentation\",\n"
+            + "     \"case_type_id\": null,\n"
             + "     \"created_date\": null,\n"
             + "     \"last_modified\": \"2019-10-25T21:24:18.143\",\n"
             + "     \"security_classification\": null,\n"

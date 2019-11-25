@@ -31,8 +31,7 @@ public class Task {
     private String caseTypeId;
     private LocalDateTime lastModifiedDate;
 
-    public static Task fromCcdCase(Map<String, Object> caseData) throws CaseTransformException {
-        String caseTypeId = (String) caseData.get("case_type_id");
+    public static Task fromCcdCase(Map<String, Object> caseData, String caseTypeId) throws CaseTransformException {
         if (CcdConnectorService.CASE_TYPE_ID_DIVORCE.equals(caseTypeId)) {
             return fromCcdDivorceCase(caseData);
         }

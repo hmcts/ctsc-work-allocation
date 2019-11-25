@@ -20,12 +20,12 @@ import uk.gov.hmcts.reform.workallocation.queue.QueueProducer;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 @Service
 public class CcdPollingService {
@@ -122,19 +122,7 @@ public class CcdPollingService {
 
         // 5. Process data
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> cases = (List<Map<String, Object>>) divorceData.get("cases");
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> probateCases = (List<Map<String, Object>>) probateData.get("cases");
-        cases.addAll(probateCases);
-
-        List<Task> tasks = cases.stream().map(o -> {
-            try {
-                return Task.fromCcdCase(o);
-            } catch (Exception e) {
-                log.error("Failed to parse case", e);
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        List<Task> tasks = mergeResponse(divorceData, probateData);
         log.info("total number of tasks: {}", tasks.size());
         telemetryClient.trackMetric("num_of_tasks", tasks.size());
 
@@ -149,6 +137,23 @@ public class CcdPollingService {
             lastRunTimeService.insertLastRunTime(defaultLastRun);
             return defaultLastRun;
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Task> mergeResponse(Map<String, Object>... data) {
+        List<Task> tasks = new ArrayList<>();
+        Arrays.stream(data).forEach(stringObjectMap -> {
+            String caseTypeId = (String)stringObjectMap.get("case_type_id");
+            List<Map<String, Object>> cases = (List<Map<String, Object>>) stringObjectMap.get("cases");
+            cases.stream().forEach(o -> {
+                try {
+                    tasks.add(Task.fromCcdCase(o, caseTypeId));
+                } catch (Exception e) {
+                    log.error("Failed to parse case", e);
+                }
+            });
+        });
+        return tasks;
     }
 
 }

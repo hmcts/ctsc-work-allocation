@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.workallocation.model;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.workallocation.exception.CaseTransformException;
+import uk.gov.hmcts.reform.workallocation.services.CcdConnectorService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class TaskTest {
 
     @Test
     public void testConvertCaseToTaskHappyPath() throws CaseTransformException {
-        Task task = Task.fromCcdCase(divorce);
+        Task task = Task.fromCcdCase(divorce, CcdConnectorService.CASE_TYPE_ID_DIVORCE);
         assertEquals("1563460551495313", task.getId());
         assertEquals("DIVORCE", task.getJurisdiction());
         assertEquals("DIVORCE", task.getCaseTypeId());
@@ -52,12 +53,12 @@ public class TaskTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testProbateConversion() throws CaseTransformException {
-        Task task = Task.fromCcdCase(probate);
+        Task task = Task.fromCcdCase(probate, CcdConnectorService.CASE_TYPE_ID_PROBATE);
         assertEquals("ReadyforExamination-Personal", task.getState());
         assertEquals("PROBATE", task.getJurisdiction());
 
         ((Map<String, Object>)probate.get("case_data")).put("applicationType", "Solicitor");
-        task = Task.fromCcdCase(probate);
+        task = Task.fromCcdCase(probate, CcdConnectorService.CASE_TYPE_ID_PROBATE);
         assertEquals("ReadyforExamination-Solicitor", task.getState());
     }
 
@@ -65,12 +66,12 @@ public class TaskTest {
     @Test(expected = CaseTransformException.class)
     public void testConvertCaseToTaskWithoutId() throws CaseTransformException {
         divorce.remove("id");
-        Task.fromCcdCase(divorce);
+        Task.fromCcdCase(divorce, CcdConnectorService.CASE_TYPE_ID_PROBATE);
     }
 
     @Test(expected = CaseTransformException.class)
     public void testConvertCaseToTaskWitWrongDateFormat() throws CaseTransformException {
         divorce.put("last_modified", "asdasd121234");
-        Task.fromCcdCase(divorce);
+        Task.fromCcdCase(divorce, CcdConnectorService.CASE_TYPE_ID_PROBATE);
     }
 }

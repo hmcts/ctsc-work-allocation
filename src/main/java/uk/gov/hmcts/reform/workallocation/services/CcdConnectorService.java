@@ -62,8 +62,6 @@ public class CcdConnectorService {
         return searchCases(
             userAuthToken,
             serviceToken,
-            queryFromDateTime,
-            queryToDateTime,
             query,
             CASE_TYPE_ID_DIVORCE
         );
@@ -78,16 +76,12 @@ public class CcdConnectorService {
         return searchCases(
             userAuthToken,
             serviceToken,
-            queryFromDateTime,
-            queryToDateTime,
             query,
             CASE_TYPE_ID_PROBATE
         );
     }
 
-    private Map<String, Object> searchCases(String userAuthToken, String serviceToken,
-                                            String queryFromDateTime, String queryToDateTime, String query,
-                                            String caseTypeId)
+    private Map<String, Object> searchCases(String userAuthToken, String serviceToken, String query, String caseTypeId)
             throws CcdConnectionException {
         Map<String, Object> response;
         if (dryRun) {
