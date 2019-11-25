@@ -50,6 +50,7 @@ public class TaskTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testProbateConversion() throws CaseTransformException {
         Task task = Task.fromCcdCase(probate);
         assertEquals("ReadyforExamination-Personal", task.getState());
