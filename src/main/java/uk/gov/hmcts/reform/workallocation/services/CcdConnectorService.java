@@ -46,7 +46,7 @@ public class CcdConnectorService {
         + "{\"bool\":{\"must\":[{\"match\":{\"state\":\"BOCaseStopped\"}},{\"match\":"
         + "{\"data.evidenceHandled\":\"Yes\"}}]}},{\"bool\":{\"must\":[{\"match\":{\"state\":\"BOCaseStopped\"}},"
         + "{\"match\":{\"data.evidenceHandled\":\"No\"}}]}}]}}]}},\"_source\":[\"reference\",\"jurisdiction\","
-        + "\"state\",\"last_modified\",\"data.applicationType\",\"data.evidenceHandled\"],\"size\":500}";
+        + "\"state\",\"last_modified\",\"data.applicationType\",\"data.evidenceHandled\"],\"size\":1000}";
 
     @Autowired
     public CcdConnectorService(CcdClient ccdClient) {
