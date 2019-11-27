@@ -37,7 +37,7 @@ public class CcdConnectorService {
         + "\"size\": 1000}";
 
     private static final String QUERY_PROBATE_TEMPLATE = "{\"query\":{\"bool\":{\"must\":[{\"range\":"
-        + "{\"last_modified\":{\"gte\":\""  +FROM_PLACE_HOLDER + "\",\"lte\":\"" + TO_PLACE_HOLDER + "\"}}},"
+        + "{\"last_modified\":{\"gte\":\"" + FROM_PLACE_HOLDER + "\",\"lte\":\"" + TO_PLACE_HOLDER + "\"}}},"
         + "{\"bool\":{\"should\":[{\"bool\":{\"must\":[{\"match\":{\"state\":\"CasePrinted\"}},{\"match\":"
         + "{\"data.evidenceHandled\":\"No\"}}]}},{\"bool\":{\"must\":[{\"match\":{\"state\":\"CaseCreated\"}}]}}"
         + ",{\"bool\":{\"must\":[{\"match\":{\"state\":\"BOReadyForExamination\"}},{\"match\":"
