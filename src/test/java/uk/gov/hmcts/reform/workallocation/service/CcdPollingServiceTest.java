@@ -64,8 +64,8 @@ public class CcdPollingServiceTest {
             30, 5, queueProducer,
             queueConsumer, deadQueueConsumer, telemetryClient);
 
-        when(deadQueueConsumer.runConsumer(any())).thenReturn(CompletableFuture.completedFuture(null));
-        when(queueConsumer.runConsumer(any())).thenReturn(CompletableFuture.completedFuture(null));
+        when(deadQueueConsumer.runConsumer(any(), any())).thenReturn(CompletableFuture.completedFuture(null));
+        when(queueConsumer.runConsumer(any(), any())).thenReturn(CompletableFuture.completedFuture(null));
 
         Map<String, Object> divorceResponse = divorceSearchResult();
         divorceResponse.put("case_type_id", "DIVORCE");
@@ -117,7 +117,7 @@ public class CcdPollingServiceTest {
         CompletableFuture<Void> consumerResponse = new CompletableFuture<>();
         consumerResponse.completeExceptionally(new RuntimeException("Something went wrong"));
         when(lastRunTimeService.getLastRunTime()).thenReturn(Optional.of(LocalDateTime.of(2019, 9, 25, 12, 0, 0, 0)));
-        when(queueConsumer.runConsumer(any())).thenReturn(consumerResponse);
+        when(queueConsumer.runConsumer(any(), any())).thenReturn(consumerResponse);
         ccdPollingService.pollCcdEndpoint();
         Task task1 = getDivorceTask();
         Task task2 = getProbateTask();
@@ -133,7 +133,7 @@ public class CcdPollingServiceTest {
         CompletableFuture<Void> consumerResponse = new CompletableFuture<>();
         consumerResponse.completeExceptionally(new RuntimeException("Something went wrong"));
         when(lastRunTimeService.getLastRunTime()).thenReturn(Optional.of(LocalDateTime.of(2019, 9, 25, 12, 0, 0, 0)));
-        when(deadQueueConsumer.runConsumer(any())).thenReturn(consumerResponse);
+        when(deadQueueConsumer.runConsumer(any(), any())).thenReturn(consumerResponse);
         ccdPollingService.pollCcdEndpoint();
         Task task1 = getDivorceTask();
         Task task2 = getProbateTask();

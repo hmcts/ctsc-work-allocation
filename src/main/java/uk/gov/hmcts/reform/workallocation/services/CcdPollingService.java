@@ -83,11 +83,11 @@ public class CcdPollingService {
         // Handling dead letters
         log.info("collecting dead letters");
         deadQueueConsumer
-            .runConsumer(delayedExecutor)
+            .runConsumer(delayedExecutor, lastRunTime.plusMinutes(20))
             .thenCompose(aVoid -> {
                 // Start queue client
                 log.info("poll started");
-                return queueConsumer.runConsumer(delayedExecutor);
+                return queueConsumer.runConsumer(delayedExecutor, lastRunTime.plusMinutes(20));
             }).whenComplete((aVoid, throwable) -> {
                 if (throwable != null) {
                     log.error("There was an error running queue client", throwable);
