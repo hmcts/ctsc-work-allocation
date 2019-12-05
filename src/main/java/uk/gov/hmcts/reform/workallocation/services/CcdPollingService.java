@@ -102,10 +102,8 @@ public class CcdPollingService {
         String userAuthToken = this.idamService.getIdamOauth2Token();
 
         // 4. connect to CCD, and get the data
-        // TODO  Properly setup overlap between the runs
-        // TODO Change the query to include end time as well
         String queryFromDateTime = lastRunTime.minusMinutes(lastModifiedTimeMinusMinutes).toString();
-        String queryToDateTime = now.toString();
+        String queryToDateTime = now.minusMinutes(lastModifiedTimeMinusMinutes).toString();
         // Divorce cases
         Map<String, Object> divorceData = ccdConnectorService.searchDivorceCases(userAuthToken, serviceToken,
             queryFromDateTime, queryToDateTime);
