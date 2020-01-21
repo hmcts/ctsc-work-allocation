@@ -57,5 +57,6 @@
       <cve>CVE-2018-1000844</cve>
       <cve>CVE-2018-1000850</cve>
       <cve>CVE-2019-17563</cve>
+      <cve>CVE-2019-20330</cve>
     </suppress>
 </suppressions>
