@@ -54,6 +54,11 @@
     </suppress>
     <suppress>
       <notes>latest upgrades issues</notes>
+      <cve>CVE-2019-10782</cve>
+      <cve>CVE-2019-20330</cve>
+      <cve>CVE-2019-14893</cve>
+      <cve>CVE-2020-8840</cve>
+      <cve>CVE-2019-14892</cve>
       <cve>CVE-2020-10672</cve>
       <cve>CVE-2020-10673</cve>
       <cve>CVE-2020-10968</cve>
