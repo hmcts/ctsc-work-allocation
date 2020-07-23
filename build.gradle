@@ -15,8 +15,8 @@ plugins {
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 sourceSets {
   functionalTest {
@@ -163,7 +163,7 @@ def versions = [
 ]
 
 configurations.all {
-  resolutionStrategy {  
+  resolutionStrategy {
     eachDependency { DependencyResolveDetails details ->
       if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype']) {
         details.useVersion '2.9.9'
@@ -199,14 +199,14 @@ dependencies {
   compile group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.2.0'
   compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.0.+'
   compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.5.RELEASE'
-  
+
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.12'
 
   compile group: 'org.apache.velocity', name: 'velocity', version: '1.7'
 
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.10.3'
   compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.10.3'
-  
+
   compile group: 'io.vavr', name: 'vavr', version: '0.10.2'
   compile group: 'org.flywaydb', name: 'flyway-core', version: '6.3.2'
 
