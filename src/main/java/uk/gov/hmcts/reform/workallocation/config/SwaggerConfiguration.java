@@ -10,7 +10,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.gov.hmcts.reform.workallocation.Application;
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfiguration {
 
     @Bean
