@@ -5,9 +5,9 @@ provider "azurerm" {
 locals {
   tags = "${merge(
     var.common_tags,
-    map(
-      "Team Name", "CTSC"
-  ))}"
+    tomap({
+      "Team Name" = "CTSC"
+  }))}"
   vaultName = "${var.product}-${var.env}"
   asp_name  = "${var.product}-${var.env}"
 }
@@ -128,15 +128,16 @@ module "work-allocation-queue" {
 }
 
 module "bar-database" {
-  source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
-  product         = "${var.product}-postgres-db"
-  location        = var.location_app
-  env             = var.env
-  postgresql_user = var.postgresql_user
-  database_name   = var.database_name
-  sku_name        = "GP_Gen5_2"
-  sku_tier        = "GeneralPurpose"
-  common_tags     = var.common_tags
-  subscription    = var.subscription
+  source             = "git@github.com:hmcts/cnp-module-postgres?ref=master"
+  product            = "${var.product}-postgres-db"
+  location           = var.location_app
+  env                = var.env
+  postgresql_user    = var.postgresql_user
+  postgresql_version = var.postgresql_version
+  database_name      = var.database_name
+  sku_name           = "GP_Gen5_2"
+  sku_tier           = "GeneralPurpose"
+  common_tags        = var.common_tags
+  subscription       = var.subscription
 }
 

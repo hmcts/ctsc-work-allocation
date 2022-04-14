@@ -52,6 +52,10 @@ variable "postgresql_user" {
   default = "workallocation"
 }
 
+variable "postgresql_version" {
+  default = 9.6
+}
+
 variable "liquibase_enabled" {
   default = "false"
 }
