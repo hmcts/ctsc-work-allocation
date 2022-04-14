@@ -178,6 +178,9 @@ dependencyManagement {
       entry 'netty-resolver-dns'
       entry 'netty-resolver-dns-native-macos'
     }
+    dependencySet(group: 'org.asynchttpclient', version: '12.2.3') {
+      entry 'async-http-client'
+    }
   }
 }
 
