@@ -59,6 +59,10 @@
       <cve>CVE-2019-16869</cve>
     </suppress>
     <suppress>
+      <notes>async-http-client-netty-utils-2.12.3.jar issues</notes>
+      <cve>CVE-2021-43138</cve>
+    </suppress>
+    <suppress>
       <notes>latest upgrades issues</notes>
       <cve>CVE-2019-10782</cve>
       <cve>CVE-2019-20330</cve>
@@ -246,6 +250,13 @@
     </suppress>
     <suppress>
       <notes><![CDATA[
+    file name: lang-tag-1.6.jar
+    ]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.nimbusds/lang\-tag@.*$</packageUrl>
+      <cve>CVE-2020-23171</cve>
+    </suppress>
+    <suppress>
+      <notes><![CDATA[
      file name: tomcat-embed-core-9.0.39.jar
      ]]></notes>
       <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
@@ -279,4 +290,9 @@
       <packageUrl regex="true">^pkg:maven/org\.hibernate\.validator/hibernate\-validator@.*$</packageUrl>
       <vulnerabilityName>CVE-2020-10693</vulnerabilityName>
     </suppress>
+    <suppress>
+      <notes><![CDATA[file name: adal4j-1.6.7.jar]]></notes>
+      <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
+      <cve>CVE-2021-42306</cve>
+</suppress>
 </suppressions>
