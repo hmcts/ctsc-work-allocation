@@ -190,6 +190,10 @@ repositories {
   mavenCentral()
 }
 
+ext {
+  set('springCloudVersion', "2021.0.1")
+}
+
 def versions = [
   junit           : '5.5.0',
   reformLogging   : '5.0.1',
