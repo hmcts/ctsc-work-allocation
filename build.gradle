@@ -222,7 +222,6 @@ dependencies {
   implementation group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.6.4'
 
   implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
-  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap', version: '3.0.3'
   implementation group: 'uk.gov.hmcts.reform', name: 'java-logging', version: versions.reformLogging
   implementation group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.6'
 
