@@ -263,7 +263,7 @@ dependencies {
   testCompile 'org.assertj:assertj-core:3.19.0'
   testCompile 'com.tngtech.java:junit-dataprovider:1.13.1'
 
-  compileOnly 'com.google.code.findbugs:annotations:3.0.1u2'
+  compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 }
 
 test {
