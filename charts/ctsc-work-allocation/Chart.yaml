@@ -3,10 +3,10 @@ appVersion: "1.0"
 description: A Helm chart for CTSC work allocation
 name: ctsc-work-allocation
 home: https://github.com/hmcts/ctsc-work-allocation.git
-version: 0.1.5
+version: 0.1.6
 maintainers:
   - name: CTSC technical team
 dependencies:
   - name: java
-    version: 3.4.5
+    version: 4.0.1
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/
