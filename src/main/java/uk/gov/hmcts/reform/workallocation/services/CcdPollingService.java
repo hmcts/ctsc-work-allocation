@@ -106,22 +106,64 @@ public class CcdPollingService {
         String queryToDateTime = now.minusMinutes(lastModifiedTimeMinusMinutes).toString();
         // Divorce cases
         Map<String, Object> divorceData = ccdConnectorService.searchDivorceCases(userAuthToken, serviceToken,
-            queryFromDateTime, queryToDateTime);
-        log.info("Connecting to CCD was successful");
+            queryFromDateTime, queryToDateTime, CcdConnectorService.CASE_TYPE_ID_DIVORCE);
+        log.info("Connecting (divorce) to CCD was successful");
         log.info("total number of divorce cases: {}", divorceData.get("total"));
         telemetryClient.trackMetric("num_of_divorce_cases", (Integer) divorceData.get("total"));
 
-        // Probate cases
-        Map<String, Object> probateData = ccdConnectorService.searchProbateCases(userAuthToken, serviceToken,
-            queryFromDateTime, queryToDateTime);
-        log.info("Connecting to CCD was successful");
-        log.info("total number of probate cases: {}", probateData.get("total"));
-        telemetryClient.trackMetric("num_of_probate_cases", (Integer) probateData.get("total"));
+        // Divorce Exception cases
+        Map<String, Object> divorceExceptionData = ccdConnectorService.searchDivorceCases(userAuthToken, serviceToken,
+                queryFromDateTime, queryToDateTime,  CcdConnectorService.CASE_TYPE_ID_DIVORCE_EXCEPTION);
+        log.info("Connecting (divorceExceptionData) to CCD was successful");
+        log.info("total number of divorce exception cases: {}", divorceExceptionData.get("total"));
+        telemetryClient.trackMetric("num_of_divorce_exception_cases", (Integer) divorceExceptionData.get("total"));
+
+        // Divorce Evidence Handled cases
+        Map<String, Object> divorceEvidenceData = ccdConnectorService.searchDivorceEvidenceHandledCases(userAuthToken,
+                serviceToken, queryFromDateTime, queryToDateTime, CcdConnectorService.CASE_TYPE_ID_DIVORCE);
+        log.info("Connecting (divorce Evidence) to CCD was successful");
+        log.info("Divorce Evidence EVIDENCE_FLOW: {}", divorceEvidenceData.get("EVIDENCE_FLOW"));
+        log.info("total number of divorce Evidence cases: {}", divorceEvidenceData.get("total"));
+        telemetryClient.trackMetric("num_of_divorce_evidence_cases", (Integer) divorceEvidenceData.get("total"));
+
+        // Probate gop cases
+        Map<String, Object> probateGoPData = ccdConnectorService.findProbateCases(userAuthToken, serviceToken,
+                queryFromDateTime, queryToDateTime, CcdConnectorService.PROBATE_CASE_TYPE_ID_GOP);
+        log.info("Connecting to CCD - GoP was successful");
+        log.info("Total number of probate gop cases: {}", probateGoPData.get("total"));
+        telemetryClient.trackMetric("num_of_probate_gop_cases", (Integer) probateGoPData.get("total"));
+        // Probate caveat cases
+        Map<String, Object> probateCaveatData = ccdConnectorService.findProbateCases(userAuthToken, serviceToken,
+                queryFromDateTime, queryToDateTime, CcdConnectorService.PROBATE_CASE_TYPE_ID_CAVEAT);
+        log.info("Connecting to CCD - Caveat was successful");
+        log.info("Total number of probate caveat cases: {}", probateCaveatData.get("total"));
+        telemetryClient.trackMetric("num_of_probate_caveat_cases", (Integer) probateCaveatData.get("total"));
+        // Probate bsp exception cases
+        Map<String, Object> probateBspExpData = ccdConnectorService.findProbateCases(userAuthToken, serviceToken,
+            queryFromDateTime, queryToDateTime, CcdConnectorService.PROBATE_CASE_TYPE_ID_BSP_EXCEPTION);
+        log.info("Connecting to CCD - bsp was successful");
+        log.info("Total number of probate bsp cases: {}", probateBspExpData.get("total"));
+        telemetryClient.trackMetric("num_of_probate_bsp_cases", (Integer) probateBspExpData.get("total"));
+
+        // FR cases
+        Map<String, Object> frData = ccdConnectorService.findFinancialRemedyCases(userAuthToken, serviceToken,
+            queryFromDateTime, queryToDateTime, CcdConnectorService.FR_CASE_TYPE);
+        log.info("Connecting (fr) to CCD was successful");
+        log.info("total number of fr cases: {}", frData.get("total"));
+        telemetryClient.trackMetric("num_of_fr_cases", (Integer) frData.get("total"));
+
+        // FR Exception cases
+        Map<String, Object> frExceptionData = ccdConnectorService.findFinancialRemedyCases(userAuthToken, serviceToken,
+            queryFromDateTime, queryToDateTime, CcdConnectorService.FR_EXCEPTION_CASE_TYPE);
+        log.info("Connecting (frException) to CCD was successful");
+        log.info("total number of fr exception cases: {}", frExceptionData.get("total"));
+        telemetryClient.trackMetric("num_of_fr_exception_cases", (Integer) frExceptionData.get("total"));
 
         // 5. Process data
         @SuppressWarnings("unchecked")
-        List<Task> tasks = mergeResponse(divorceData, probateData);
-        log.info("total number of tasks: {}", tasks.size());
+        List<Task> tasks = mergeResponse(divorceData, divorceExceptionData, divorceEvidenceData,
+                probateGoPData, probateCaveatData, probateBspExpData, frData, frExceptionData);
+        log.info("Total number of tasks: {}", tasks.size());
         telemetryClient.trackMetric("num_of_tasks", tasks.size());
 
         // 6. send to azure service bus
@@ -142,10 +184,11 @@ public class CcdPollingService {
         List<Task> tasks = new ArrayList<>();
         Arrays.stream(data).forEach(stringObjectMap -> {
             String caseTypeId = (String)stringObjectMap.get("case_type_id");
+            String evidenceFlow = (String)stringObjectMap.get("EVIDENCE_FLOW");
             List<Map<String, Object>> cases = (List<Map<String, Object>>) stringObjectMap.get("cases");
             cases.stream().forEach(o -> {
                 try {
-                    tasks.add(Task.fromCcdCase(o, caseTypeId));
+                    tasks.add(Task.fromCcdCase(o, caseTypeId, evidenceFlow));
                 } catch (Exception e) {
                     log.error("Failed to parse case", e);
                 }
